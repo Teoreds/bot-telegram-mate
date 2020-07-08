@@ -78,22 +78,20 @@ def svuota(file, h=None):#accede al file e lo svuota
 
 
 def cancella_riga(file, riga):#accede al file ed elimina la riga richiesta
-    if type(riga) == int:#controllo che riga sia un intero
-        
-        with open(file, "r") as f:#apre il file e separa le righe diverse, ottengo una lista con tutte le righe
-            righe = f.read().decode('UTF-8').splitlines()
+    with open(file, "r") as f:#apre il file e separa le righe diverse, ottengo una lista con tutte le righe
+        righe = f.read().decode('UTF-8').splitlines()
     
-        righe.pop(riga-1)#rimuovo la riga richiesta, facendo attenzione all'indice
+    righe.pop(int(riga)-1)#rimuovo la riga richiesta
         
-        with open(file, "a") as f:#"ricompilo" le righe senza quella rimossa
-            f.write(('\n'.join(righe)).encode('UTF-8'))
-            
+    with open(file, "w") as f:#"ricompilo" le righe senza quella rimossa
+        f.write(('\n'.join(righe)).encode('UTF-8'))
 
 
 def aggiungi_frase(file, frase):#accede al file e appende una nuova frase
     with open(file, "a") as f:#apro il file richiesto e appendo la frase
         f.write(('\n'+frase).encode('UTF-8'))
 
+    
 def comandi(chat_id):#printa una leggenda dei comandi eseguibili
     bot.sendMessage(chat_id, "I comandi disponibili sono '.news', '.frase', '.comandi', '.w argomento' (l'argomento deve essere il calcolo che si vuole eseguire, ad esempio limit(x->0)[x*log(x)] o derivata x^2 o integral sen(x)...)")
     
