@@ -1,7 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from pprint import pprint
-from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 import telepot
 import sys, time
 import wolframalpha
@@ -12,99 +10,115 @@ client = wolframalpha.Client(########)
 bot = telepot.Bot(###########)
 
 def on_chat_message(msg):
+    '''gestore dei messaggi inviati nella chat col bot'''
     content_type, chat_type, chat_id = telepot.glance(msg)
-    mess = msg['text']
-    if '.' == msg['text'][0]:
-        if len(msg['text']) > 3:
-            try:
-                if '.bot' == msg['text']:
-                    bot.sendMessage(chat_id, 'Posso fare tante cose, ' + 'clicca qui per capire come sfruttarmi: \n' + 'https://t.me/c/1373295830/458' )
-                elif '.news' == msg['text']:
-                    f = open("comunicazioni.txt","r")
-                    a = 'Ultime comunicazioni:'
-                    b = f.read().decode('UTF-8')
-                    a += '\n' + b
-                    f.close()
-                    if b == '':
-                        a = 'Non ci sono nuove comunicazioni.'
-                    bot.sendMessage(chat_id, a)
-                elif '.LPTcancella' == msg['text'][0:12]:
-                    if len(msg['text']) == 12:
-                        f = open("comunicazioni.txt","w")
-                        f.write('')
-                        f.close()
-                        bot.sendMessage(chat_id, "ok capo, ho cancellato tutte le news. Nessuno saprà mai cos'è successo realmente con quel prete dell'appennino...")
-                    else:
-                        f = open("comunicazioni.txt","r")
-                        a = f.read()
-                        b = ''
-                        c = 0
-                        for i in range(len(a)):
-                            if c != int(msg['text'][13]):
-                                b += a[i]
-                            if a[i] == "-":
-                                c += 1
-                        f.close()
-                        f = open("comunicazioni.txt","w")
-                        if b[len(b)-1] == "-":
-                            b = b[:len(b)-2:]
-                        f.write(b)
-                        f.close()
-                        bot.sendMessage(chat_id, "ok capo, ho rimosso la riga numero " + msg['text'][13])
-                elif '.LPTaggiungi' == msg['text'][0:12]:
-                    f = open("comunicazioni.txt","r+")
-                    if f.read() == '':
-                        f.write(('-' + msg['text'][12:]).encode('UTF-8'))
-                    else:
-                        f.close()
-                        f = open("comunicazioni.txt","a")
-                        f.write(('\n-'+msg['text'][12:]).encode('UTF-8'))
-                    f.close()
-                    bot.sendMessage(chat_id, 'ok capo, ho cambiato le news, per vederle scrivi .news')
-                elif '.frase' == msg['text'][0:6]:
-                    if len(msg['text']) > 15 and msg['text'][7:15] == 'aggiungi':
-                        f = open("frasi.txt","a")
-                        f.write(("_" + msg['text'][16:]).encode('UTF-8'))
-                        bot.sendMessage(chat_id, 'ok capo, ho aggiunto la frase')
-                    else:
-                        f = open("frasi.txt","r")
-                        frasi = f.read().decode('UTF-8')
-                        b = 0
-                        for el in frasi:
-                            if el == "_":
-                                b += 1
-                        frase = random.randint(1,b)
-                        d = 0
-                        i = 0
-                        c = ''
-                        while i < len(frasi):
-                            if frasi[i] == "_":
-                                d += 1
-                            elif d == frase:
-                                c += frasi[i]
-                            i += 1
-                        bot.sendMessage(chat_id, c)
-                elif '.comandi' == msg['text']:
-                    bot.sendMessage(chat_id, 'Ecco cosa posso fare: \ntutti i comandi di matematica, ad esempio .limit .derivata .integral .converge ovviamente è importante inserire l argomento di quelle funzioni. \n\nInoltre con .news puoi controllare tutte le comunicazioni, mentre con .frase mi fai dire una frase a caso di qualche prof.')
-                else:
-                    i = 0
-                    sol = client.query(msg['text'][1:])
-                    answer = next(sol.results).text
-#                     while '@primary' not in sol['pod'][i]:
-#                         i += 1
-                    bot.sendMessage(chat_id, answer)
-            except:
-                bot.sendMessage(chat_id, 'Comando invalido, chiedo scudo. Per capire quali sono i comandi legali digita ".bot"')
-#     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-#         [InlineKeyboardButton(text='Cliccami', callback_data='press')],])
-#     
-#     bot.sendMessage(chat_id, 'Non scrivere un msg['text']aggio, usa la inline keyboard', reply_markup=keyboard)
-#     
-# def on_callback_query(msg):
-#     query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
-#     print("Callback Query: ",query_id, from_id, query_data)
-#     
-#     bot.answerCallbackQuery(query_id, text= "YEAH")
+
+    if content_type == "text" and msg['text'][0] == '.':#controllo che il messaggio sia testuale e inizi col punto
+        msg_text = msg['text'][1:].lower().split(None, 1)#separo il comando dall'argomento, tutto dentro un'unica lista contenente i due elementi
+        
+        if msg_text[0] in comandi:#controllo che il comando sia legale            
+            comandi[msg_text[0]](msg_text[-1], chat_id)#accedo al dizionario comandi, eseguo la funzione associata a msg_txt[0] con argomenti il resto del comando e la chat_id
+        
+        else:            
+            bot.sendMessage(chat_id, 'Comando errato. Per una lista di comandi puoi scrivere .comandi')
+
+
+def w(calcolo, chat_id):
+    '''passa a wolframalpha il calcolo, prende risultato in forma testuale e lo invia'''    
+    try:#spesso wolframalpha fa brutti scherzi
+        sol = client.query(calcolo)
+        answer = next(sol.results).text#mi interessa solo la parte dei risultati. Notare anche che tutte le immagini che restituisce sono fallate e i link non funzionano.
+        
+        bot.sendMessage(chat_id, answer)#restituisco il risultato
+        
+    except:#se qualcosa va storto col calcolo o se non trova "results", il che capita spesso...
+        
+        bot.sendMessage(chat_id, 'Non sono riuscito ad ottenere il risultato richiesto. Sicuro di aver formattato bene il messaggio?')
+
+
+def news(action, chat_id):
+    '''accede al file comunicazioni e restituisce tutte le news, oppure esegue un'azione sulle news'''
+    if action == 'news':#comunica solamente le news
+        
+        with open("comunicazioni.txt","r") as f:#qui apre le news e le raccoglie in una stringa chiamata notizie    
+            notizie = f.read().decode('UTF-8')
+
+        risposta = 'Ultime comunicazioni:' + notizie#concatena le notizie in modo elegante
+        
+        if notizie == '':        
+            risposta = 'Non ci sono nuove comunicazioni.'#se non c'erano notizie restituisce un messaggio particolare
+            
+        bot.sendMessage(chat_id, risposta)
+           
+    else:#è stata eseguita un'azione sulle news
+        action_list = action.split(None, 1)#spezziamo l'azione da l'argomento dell'azione.
+    
+        if action_list[0] in azioni:#controllo legalità dell'azione        
+            azioni[action_list[0]]("comunicazioni.txt", action_list[-1])#come il dizionario dei comandi, qua accedo al dizionario delle azioni (funzioni)
+
+
+def frase(action, chat_id):
+    '''accede al file delle frasi e ne restituisce una casuale, oppure esegue un'azione sulle frasi'''
+
+    if action == 'frase':#sceglie una frase random e la scrive
+        
+        with open("frasi.txt","r") as f:#qui apre le frasi e le mette, separate, in una lista    
+            frasi = f.read().decode('UTF-8').splitlines()
+
+        numero = random.randint(1,len(frasi))#scelgo un numero casuale, che corrisponde alla frase casuale che scelgo        
+        bot.sendMessage(chat_id, frasi[numero])
+        
+    else:#è stata eseguita un'azione sulle frasi
+        action_list = action.split(None, 1)#spezziamo l'azione dal suo argomento
+        
+        if action_list[0] in azioni:#controllo la legalità dell'azione        
+            azioni[action_list[0]]("frasi.txt", action_list[-1])#accedo al dizionario delle azioni e eseguo quella richiesta, con parametri opportuni
+            
+            bot.sendMessage(chat_id, 'Fatto. Posso fare altro per lei, padrone?')
+
+def svuota(file, h=None):
+    '''accede al file e lo svuota'''
+    with open(file, "w") as f:#apre il file e ci scrive '' al posto di tutto il resto
+        f.write('')
+
+
+def cancella_riga(file, riga):
+    '''accede al file ed elimina la riga richiesta'''
+    if type(riga) == int:#controllo che riga sia un intero
+        
+        with open(file, "r") as f:#apre il file e separa le righe diverse, ottengo una lista con tutte le righe
+            righe = f.read().decode('UTF-8').splitlines()
+    
+        righe.pop(riga)#rimuovo la riga richiesta
+        
+        with open(file, "r") as f:#"ricompilo" le righe senza quella rimossa
+            f.write(('\n'.join(righe)).encode('UTF-8'))
+            
+
+
+def aggiungi_frase(file, frase):
+    '''accede al file e appende una nuova frase'''
+    with open(file, "a") as f:#apro il file richiesto e appendo la frase
+        f.write(('\n'+frase).encode('UTF-8'))
+
+def comandi(chat_id):
+    '''printa una leggenda dei comandi eseguibili'''
+    bot.sendMessage(chat_id, "I comandi disponibili sono '.news', '.frase', '.comandi', '.w argomento' (l'argomento deve essere il calcolo che si vuole eseguire, ad esempio limit(x->0)[x*log(x)] o derivata x^2 o integral sen(x)...)")
+    
+    
+comandi = {
+    'w':w,
+    'news':news,
+    'frase':frase,
+    'comandi':comandi
+    }
+
+azioni = {
+    'svuota':svuota,
+    'cancella_riga':cancella_riga,
+    'aggiungi_frase':aggiungi_frase
+    }
+
 
 bot.message_loop({'chat': on_chat_message})
 
