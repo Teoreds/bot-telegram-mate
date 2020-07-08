@@ -83,9 +83,9 @@ def cancella_riga(file, riga):#accede al file ed elimina la riga richiesta
         with open(file, "r") as f:#apre il file e separa le righe diverse, ottengo una lista con tutte le righe
             righe = f.read().decode('UTF-8').splitlines()
     
-        righe.pop(riga)#rimuovo la riga richiesta
+        righe.pop(riga-1)#rimuovo la riga richiesta, facendo attenzione all'indice
         
-        with open(file, "r") as f:#"ricompilo" le righe senza quella rimossa
+        with open(file, "a") as f:#"ricompilo" le righe senza quella rimossa
             f.write(('\n'.join(righe)).encode('UTF-8'))
             
 
