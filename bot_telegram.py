@@ -9,8 +9,7 @@ client = wolframalpha.Client(########)
 
 bot = telepot.Bot(###########)
 
-def on_chat_message(msg):
-    """gestore dei messaggi inviati nella chat col bot"""
+def on_chat_message(msg):#gestore dei messaggi inviati nella chat col bot
     content_type, chat_type, chat_id = telepot.glance(msg)
 
     if content_type == "text" and msg['text'][0] == '.':#controllo che il messaggio sia testuale e inizi col punto
@@ -23,8 +22,7 @@ def on_chat_message(msg):
             bot.sendMessage(chat_id, 'Comando errato. Per una lista di comandi puoi scrivere .comandi')
 
 
-def w(calcolo, chat_id):
-    """passa a wolframalpha il calcolo, prende risultato in forma testuale e lo invia"""    
+def w(calcolo, chat_id):#passa a wolframalpha il calcolo, prende risultato in forma testuale e lo invia 
     try:#spesso wolframalpha fa brutti scherzi
         sol = client.query(calcolo)
         answer = next(sol.results).text#mi interessa solo la parte dei risultati. Notare anche che tutte le immagini che restituisce sono fallate e i link non funzionano.
@@ -36,8 +34,7 @@ def w(calcolo, chat_id):
         bot.sendMessage(chat_id, 'Non sono riuscito ad ottenere il risultato richiesto. Sicuro di aver formattato bene il messaggio?')
 
 
-def news(action, chat_id):
-    """accede al file comunicazioni e restituisce tutte le news, oppure esegue un'azione sulle news"""
+def news(action, chat_id):#accede al file comunicazioni e restituisce tutte le news, oppure esegue un'azione sulle news
     if action == 'news':#comunica solamente le news
         
         with open("comunicazioni.txt","r") as f:#qui apre le news e le raccoglie in una stringa chiamata notizie    
@@ -57,8 +54,7 @@ def news(action, chat_id):
             azioni[action_list[0]]("comunicazioni.txt", action_list[-1])#come il dizionario dei comandi, qua accedo al dizionario delle azioni (funzioni)
 
 
-def frase(action, chat_id):
-    """accede al file delle frasi e ne restituisce una casuale, oppure esegue un'azione sulle frasi"""
+def frase(action, chat_id):#accede al file delle frasi e ne restituisce una casuale, oppure esegue un'azione sulle frasi
 
     if action == 'frase':#sceglie una frase random e la scrive
         
@@ -76,14 +72,12 @@ def frase(action, chat_id):
             
             bot.sendMessage(chat_id, 'Fatto. Posso fare altro per lei, padrone?')
 
-def svuota(file, h=None):
-    """accede al file e lo svuota"""
+def svuota(file, h=None):#accede al file e lo svuota
     with open(file, "w") as f:#apre il file e ci scrive '' al posto di tutto il resto
         f.write('')
 
 
-def cancella_riga(file, riga):
-    """accede al file ed elimina la riga richiesta"""
+def cancella_riga(file, riga):#accede al file ed elimina la riga richiesta
     if type(riga) == int:#controllo che riga sia un intero
         
         with open(file, "r") as f:#apre il file e separa le righe diverse, ottengo una lista con tutte le righe
@@ -96,13 +90,11 @@ def cancella_riga(file, riga):
             
 
 
-def aggiungi_frase(file, frase):
-    """accede al file e appende una nuova frase"""
+def aggiungi_frase(file, frase):#accede al file e appende una nuova frase
     with open(file, "a") as f:#apro il file richiesto e appendo la frase
         f.write(('\n'+frase).encode('UTF-8'))
 
-def comandi(chat_id):
-    """printa una leggenda dei comandi eseguibili"""
+def comandi(chat_id):#printa una leggenda dei comandi eseguibili
     bot.sendMessage(chat_id, "I comandi disponibili sono '.news', '.frase', '.comandi', '.w argomento' (l'argomento deve essere il calcolo che si vuole eseguire, ad esempio limit(x->0)[x*log(x)] o derivata x^2 o integral sen(x)...)")
     
     
