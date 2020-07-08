@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 from pprint import pprint
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
@@ -6,12 +7,13 @@ import sys, time
 import wolframalpha
 import random
 
-client = wolframalpha.Client('UL7PYU-UVL7JT297V')
+client = wolframalpha.Client(########)
 
-bot = telepot.Bot('1364584522:AAEzEOPOEWr757FakhU-s9ZLNV35UTrfU8A')
+bot = telepot.Bot(###########)
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
+    mess = msg['text']
     if '.' == msg['text'][0]:
         if len(msg['text']) > 3:
             try:
@@ -20,14 +22,14 @@ def on_chat_message(msg):
                 elif '.news' == msg['text']:
                     f = open("comunicazioni.txt","r")
                     a = 'Ultime comunicazioni:'
-                    b = f.read()
+                    b = f.read().decode('UTF-8')
                     a += '\n' + b
                     f.close()
                     if b == '':
                         a = 'Non ci sono nuove comunicazioni.'
                     bot.sendMessage(chat_id, a)
                 elif '.LPTcancella' == msg['text'][0:12]:
-                    if len(msg['text']) == 12: 
+                    if len(msg['text']) == 12:
                         f = open("comunicazioni.txt","w")
                         f.write('')
                         f.close()
@@ -48,25 +50,25 @@ def on_chat_message(msg):
                             b = b[:len(b)-2:]
                         f.write(b)
                         f.close()
-                        bot.sendMessage(chat_id, "ok capo, ho rimosso la riga numero " + msg['text'][13])                     
+                        bot.sendMessage(chat_id, "ok capo, ho rimosso la riga numero " + msg['text'][13])
                 elif '.LPTaggiungi' == msg['text'][0:12]:
                     f = open("comunicazioni.txt","r+")
                     if f.read() == '':
-                        f.write('-' + msg['text'][12:])
+                        f.write(('-' + msg['text'][12:]).encode('UTF-8'))
                     else:
                         f.close()
                         f = open("comunicazioni.txt","a")
-                        f.write('\n-'+msg['text'][12:])
+                        f.write(('\n-'+msg['text'][12:]).encode('UTF-8'))
                     f.close()
                     bot.sendMessage(chat_id, 'ok capo, ho cambiato le news, per vederle scrivi .news')
                 elif '.frase' == msg['text'][0:6]:
                     if len(msg['text']) > 15 and msg['text'][7:15] == 'aggiungi':
                         f = open("frasi.txt","a")
-                        f.write("_" + msg['text'][16:])
+                        f.write(("_" + msg['text'][16:]).encode('UTF-8'))
                         bot.sendMessage(chat_id, 'ok capo, ho aggiunto la frase')
                     else:
                         f = open("frasi.txt","r")
-                        frasi = f.read()
+                        frasi = f.read().decode('UTF-8')
                         b = 0
                         for el in frasi:
                             if el == "_":
@@ -88,13 +90,23 @@ def on_chat_message(msg):
                     i = 0
                     sol = client.query(msg['text'][1:])
                     answer = next(sol.results).text
+#                     while '@primary' not in sol['pod'][i]:
+#                         i += 1
                     bot.sendMessage(chat_id, answer)
             except:
                 bot.sendMessage(chat_id, 'Comando invalido, chiedo scudo. Per capire quali sono i comandi legali digita ".bot"')
-
+#     keyboard = InlineKeyboardMarkup(inline_keyboard=[
+#         [InlineKeyboardButton(text='Cliccami', callback_data='press')],])
+#     
+#     bot.sendMessage(chat_id, 'Non scrivere un msg['text']aggio, usa la inline keyboard', reply_markup=keyboard)
+#     
+# def on_callback_query(msg):
+#     query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
+#     print("Callback Query: ",query_id, from_id, query_data)
+#     
+#     bot.answerCallbackQuery(query_id, text= "YEAH")
 
 bot.message_loop({'chat': on_chat_message})
 
 while 1:
     time.sleep(3)
-
