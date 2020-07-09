@@ -102,7 +102,7 @@ def aggiungi_frase(file, frase):                                                
     with open(file, "a") as f:                                                           #apro il file richiesto e appendo la frase
         f.write(('\n'+frase).encode('UTF-8'))
 
-def help(comando, chat_id):                                                              #printa una leggenda dei comandi eseguibili
+def help(comando, chat_id):                                                              #printa una legenda dei comandi eseguibili
     lista_comandi = ["." + cmd + comandi[cmd][1] for cmd in comandi]
     bot.sendMessage(chat_id, "Ecco una lista dei comandi e il loro uso. N.B: le parentesi e i segni >< servono solo a uso notazionale: non vanno inseriti nel comando." + "\n\n" + ("\n\n".join(lista_comandi)))
     
