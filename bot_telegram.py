@@ -16,10 +16,10 @@ def on_chat_message(msg):                                                       
         msg_text = msg['text'][1:].lower().split(None, 1)                                #separo il comando dall'argomento, tutto dentro un'unica lista contenente i due elementi
         
         if msg_text[0] in comandi:                                                       #controllo che il comando sia legale            
-            comandi[msg_text[0]](msg_text[-1], chat_id)                                  #accedo al dizionario comandi, eseguo la funzione associata a msg_txt[0] con argomenti il resto del comando e la chat_id
+            comandi[msg_text[0]][0](msg_text[-1], chat_id)                                  #accedo al dizionario comandi, eseguo la funzione associata a msg_txt[0] con argomenti il resto del comando e la chat_id
         
         else:            
-            bot.sendMessage(chat_id, 'Comando errato. Per una lista di comandi puoi scrivere .comandi')
+            bot.sendMessage(chat_id, 'Comando errato. Per una lista di comandi puoi scrivere .help')
 
 
 def w(calcolo, chat_id):                                                                 #passa a wolframalpha il calcolo, prende risultato in forma testuale e lo invia
@@ -67,6 +67,12 @@ def frase(action, chat_id):                                                     
             numero = random.randint(1,len(frasi)-1)                                      #scelgo un numero casuale, che corrisponde alla frase casuale che scelgo        
             bot.sendMessage(chat_id, frasi[numero])
 
+    elif action == 'tutte':
+	
+	with open("frasi.txt","r") as f:
+	    frasi = f.read().decode('UTF-8')
+	bot.sendMessage(chat_id, frasi)
+
     else:                                                                                #è stata eseguita un'azione sulle frasi
         action_list = action.split(None, 1)                                              #spezziamo l'azione dal suo argomento
         
@@ -97,20 +103,15 @@ def aggiungi_frase(file, frase):                                                
         f.write(('\n'+frase).encode('UTF-8'))
 
 def help(comando, chat_id):                                                              #printa una leggenda dei comandi eseguibili
-    bot.sendMessage(chat_id, "I comandi disponibili sono '.news', '.frase', '.comandi', '.w argomento' (l'argomento deve essere il calcolo che si vuole eseguire, ad esempio limit(x->0)[x*log(x)] o derivata x^2 o integral sen(x)...)")
+    lista_comandi = ["." + cmd + comandi[cmd][1] for cmd in comandi]
+    bot.sendMessage(chat_id, "Ecco una lista dei comandi e il loro uso. N.B: le parentesi e i segni >< servono solo a uso notazionale: non vanno inseriti nel comando." + "\n\n" + ("\n\n".join(lista_comandi)))
     
     
 comandi = {
-    'w':w,
-    'news':news,
-    'frase':frase,
-    'help':help
-    }
-
-azioni = {
-    'svuota':svuota,
-    'cancella_riga':cancella_riga,
-    'aggiungi_frase':aggiungi_frase
+    'w':[w, " [calcolo] || esegue un calcolo di wolframalpha"],
+    'news':[news, " <azione> || invia le comunicazioni recenti o (opzionale) esegue un'azione su di esse"],
+    'frase':[frase, " <azione> || invia una frase casuale o (opzionale) esegue un'azione su di esse"],
+    'help':[help, " || stampa questo messaggio"]
     }
 
 
