@@ -16,8 +16,7 @@ def on_chat_message(msg):  # gestore dei messaggi inviati nella chat col bot
 
     # controllo che il messaggio sia testuale e inizi col punto
     if content_type == "text" and msg['text'][0] == '.':
-        # separo il comando dall'argomento, tutto dentro un'unica lista
-        # contenente i due elementi
+        # separo il messaggio in comando e argomento
         cmd, args = unpack(msg['text'][1:])
 
         if cmd in comandi:
