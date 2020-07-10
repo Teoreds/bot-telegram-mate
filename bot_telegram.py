@@ -175,7 +175,7 @@ azioni = {
 
 bot.message_loop({'chat': on_chat_message})
 
-if __name__ === "__main__":
+if __name__ == "__main__":
     while True:
         time.sleep(3)
 
