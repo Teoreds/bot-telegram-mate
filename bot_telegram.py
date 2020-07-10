@@ -164,7 +164,8 @@ comandi = {
     'news': news,
     'frase': frase,
     'help': help,
-    'plot': plot}
+    'plot': plot
+}
 
 azioni = {
     'svuota': svuota,
