@@ -93,6 +93,18 @@ def frase(chat_id, args):  # accede al file delle frasi e ne restituisce una cas
                 bot.sendMessage(chat_id, 'Errore di formattazione del comando')
 
 
+def alcol(chat_id, args):
+    """ [numero alcolisti] \nti dice cosa bere. Il numero è obbligatorio"""
+    if args is not None and args.isdigit():
+        with open("alcol.txt", "r") as f:
+            shots = f.read().decode('UTF-8').splitlines()
+        risposta = [random.choice(shots) for n in range(int(args))]
+        bot.sendMessage(
+            chat_id,
+            'Ecco gli shots in ordine:\n' +
+            '\n'.join(risposta))
+
+
 def tutte(file, useless):
     with open(file, "r") as f:
         frasi = f.read().decode('UTF-8')
@@ -163,7 +175,8 @@ comandi = {
     'news': news,
     'frase': frase,
     'help': help,
-    'plot': plot
+    'plot': plot,
+    'alcol': alcol
 }
 
 azioni = {
